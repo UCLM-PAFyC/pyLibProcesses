@@ -27,7 +27,8 @@ class ProcessesManager:
         self.processes_by_provider ={}
 
     def initialize(self,
-                   process_path_by_provider):
+                   process_path_by_provider,
+                   ignored_process_name_by_provider = None):
         str_error = ''
         processes_by_provider = {}
         for provider in process_path_by_provider:
@@ -71,6 +72,10 @@ class ProcessesManager:
                     if str_error:
                         return str_error
                     process_name = process[defs_processes.PROCESS_FIELD_NAME]
+                    if ignored_process_name_by_provider is not None:
+                        if provider in ignored_process_name_by_provider:
+                            if process_name in ignored_process_name_by_provider[provider]:
+                                continue
                     processes[process_name] = process
                 processes_by_provider[provider] = processes
         self.processes_by_provider = processes_by_provider
@@ -167,47 +172,55 @@ class ProcessesManager:
             return str_error, process
         doc_file_name = json_content[defs_processes.PROCESS_FIELD_DOC]
         # process_base_name = pathlib.Path(process_file).stem
-        process_src_file = ''
+        process_src = ''
         if isinstance(src_content, dict):
-            process_src_file = src_content
+            if not defs_processes.PROCESS_SRC_ATTRIBUTE_CLASS in src_content:
+                str_error = ('ProcessesManager.load_process_file\n')
+                str_error += ("Not exists attribute: {} in field {} in process from file:\n{}".
+                              format(defs_processes.PROCESS_SRC_ATTRIBUTE_CLASS, 
+                                     defs_processes.PROCESS_FIELD_SRC, process_file))
+                return str_error, process
+            if not defs_processes.PROCESS_SRC_ATTRIBUTE_METHOD in src_content:
+                str_error = ('ProcessesManager.load_process_file\n')
+                str_error += ("Not exists attribute: {} in field {} in process from file:\n{}".
+                              format(defs_processes.PROCESS_SRC_ATTRIBUTE_METHOD, 
+                                     defs_processes.PROCESS_FIELD_SRC, process_file))
+                return str_error, process
+            process_src = src_content
         else:
             src_file_name = src_content
-            if src_file_name.casefold() == defs_processes.PROCESSES_SRC_TYPE_LIBRARY_FUNCTION.casefold():
-                process_src_file = src_file_name
-            else:
-                if src_file_name:
-                    if not os.path.exists(src_file_name):
-                        src_file_basename = os.path.basename(src_file_name)
-                        for file_basename in processes_src_files:
-                            # file_base_name = pathlib.Path(file).stem
-                            if file_basename.casefold() == src_file_basename.casefold():
-                                file_path = os.path.normcase(provider_processes_src_path + '/' + file_basename)
-                                process_src_file = file_path
-                                need_save = True
-                                break
-                    else:
-                        process_src_file = src_file_name
-        if not process_src_file:
+            if src_file_name:
+                if not os.path.exists(src_file_name):
+                    src_file_basename = os.path.basename(src_file_name)
+                    for file_basename in processes_src_files:
+                        # file_base_name = pathlib.Path(file).stem
+                        if file_basename.casefold() == src_file_basename.casefold():
+                            file_path = os.path.normcase(provider_processes_src_path + '/' + file_basename)
+                            process_src = file_path
+                            need_save = True
+                            break
+                else:
+                    process_src = src_file_name
+        if not process_src:
             str_error = ('ProcessesManager.load_process_file\n')
             str_error += ("\nIn process from file:\n{}".format(process_file))
-            str_error += ('\nProcess source file is empty')
+            str_error += ('\nInvalid field: {}'.format(defs_processes.PROCESS_FIELD_SRC))
             Tools.error_msg(str_error)
-        if not isinstance(process_src_file, dict):
-            if process_src_file.casefold() != defs_processes.PROCESSES_SRC_TYPE_LIBRARY_FUNCTION.casefold():
-                if not os.path.exists(process_src_file):
-                    str_error = ('ProcessesManager.load_process_file\n')
-                    str_error += ("\nIn process from file:\n{}".format(process_file))
-                    str_error += ('\nNot exists process source file:\n{}'.format(src_file_name))
-                    Tools.error_msg(str_error)
-                    process_src_file = ''
-        if not process_src_file:
+        if not isinstance(process_src, dict):
+            if not os.path.exists(process_src):
+                str_error = ('ProcessesManager.load_process_file\n')
+                str_error += ("\nIn process from file:\n{}".format(process_file))
+                str_error += ('\nNot exists process source file:\n{}'.format(process_src))
+                Tools.error_msg(str_error)
+                process_src = ''
+        if not process_src:
             dialog_title = 'Select process source python file'
             previous_file = None
             previous_path = self.path
             file_types = [defs_processes.PROCESSES_SRC_FILES_EXTENSION]
             file_mode = defs_pars.FILE_MODE_READ
             mandatory = True
-            str_error, process_src_file = Tools.get_file(dialog_title, previous_file, previous_path,
+            str_error, process_src = Tools.get_file(dialog_title, previous_file, previous_path,
                                                          file_types, file_mode,mandatory)
             if str_error:
                 Tools.error_msg(str_error)
@@ -258,7 +271,7 @@ class ProcessesManager:
         process[defs_processes.PROCESS_FIELD_DESCRIPTION] = process_description
         process[defs_processes.PROCESS_FIELD_PARAMETERS] = process_parameters_manager
         # process[defs_processes.PROCESS_FILE] = process_file
-        process[defs_processes.PROCESS_SRC] = process_src_file
+        process[defs_processes.PROCESS_SRC] = process_src
         process[defs_processes.PROCESS_DOC] = process_doc_file
         if need_save:
             as_dict = {}
