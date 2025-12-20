@@ -158,7 +158,8 @@ class ProcessesManager:
             str_error += ("No field {} in process from file:\n{}".
                           format(defs_processes.PROCESS_FIELD_SRC, process_file))
             return str_error, process
-        src_file_name = json_content[defs_processes.PROCESS_FIELD_SRC]
+        # src_file_name = json_content[defs_processes.PROCESS_FIELD_SRC]
+        src_content = json_content[defs_processes.PROCESS_FIELD_SRC]
         if not defs_processes.PROCESS_FIELD_DOC in json_content:
             str_error = ('ProcessesManager.load_process_file\n')
             str_error += ("No field {} in process from file:\n{}".
@@ -167,33 +168,38 @@ class ProcessesManager:
         doc_file_name = json_content[defs_processes.PROCESS_FIELD_DOC]
         # process_base_name = pathlib.Path(process_file).stem
         process_src_file = ''
-        if src_file_name.casefold() == defs_processes.PROCESSES_SRC_TYPE_LIBRARY_FUNCTION.casefold():
-            process_src_file = src_file_name
+        if isinstance(src_content, dict):
+            process_src_file = src_content
         else:
-            if src_file_name:
-                if not os.path.exists(src_file_name):
-                    src_file_basename = os.path.basename(src_file_name)
-                    for file_basename in processes_src_files:
-                        # file_base_name = pathlib.Path(file).stem
-                        if file_basename.casefold() == src_file_basename.casefold():
-                            file_path = os.path.normcase(provider_processes_src_path + '/' + file_basename)
-                            process_src_file = file_path
-                            need_save = True
-                            break
-                else:
-                    process_src_file = src_file_name
+            src_file_name = src_content
+            if src_file_name.casefold() == defs_processes.PROCESSES_SRC_TYPE_LIBRARY_FUNCTION.casefold():
+                process_src_file = src_file_name
+            else:
+                if src_file_name:
+                    if not os.path.exists(src_file_name):
+                        src_file_basename = os.path.basename(src_file_name)
+                        for file_basename in processes_src_files:
+                            # file_base_name = pathlib.Path(file).stem
+                            if file_basename.casefold() == src_file_basename.casefold():
+                                file_path = os.path.normcase(provider_processes_src_path + '/' + file_basename)
+                                process_src_file = file_path
+                                need_save = True
+                                break
+                    else:
+                        process_src_file = src_file_name
         if not process_src_file:
             str_error = ('ProcessesManager.load_process_file\n')
             str_error += ("\nIn process from file:\n{}".format(process_file))
             str_error += ('\nProcess source file is empty')
             Tools.error_msg(str_error)
-        if process_src_file.casefold() != defs_processes.PROCESSES_SRC_TYPE_LIBRARY_FUNCTION.casefold():
-            if not os.path.exists(process_src_file):
-                str_error = ('ProcessesManager.load_process_file\n')
-                str_error += ("\nIn process from file:\n{}".format(process_file))
-                str_error += ('\nNot exists process source file:\n{}'.format(src_file_name))
-                Tools.error_msg(str_error)
-                process_src_file = ''
+        if not isinstance(process_src_file, dict):
+            if process_src_file.casefold() != defs_processes.PROCESSES_SRC_TYPE_LIBRARY_FUNCTION.casefold():
+                if not os.path.exists(process_src_file):
+                    str_error = ('ProcessesManager.load_process_file\n')
+                    str_error += ("\nIn process from file:\n{}".format(process_file))
+                    str_error += ('\nNot exists process source file:\n{}'.format(src_file_name))
+                    Tools.error_msg(str_error)
+                    process_src_file = ''
         if not process_src_file:
             dialog_title = 'Select process source python file'
             previous_file = None
