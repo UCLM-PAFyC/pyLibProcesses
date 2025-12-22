@@ -5,6 +5,7 @@ import os
 import sys
 import math
 import pathlib
+import json
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
@@ -26,7 +27,8 @@ from pyLibParameters import defs_pars
 from pyLibParameters.ParametersManager import ParametersManager
 from pyLibParameters.ui_qt.ParametersManagerDialog import ParametersManagerDialog
 from pyLibQtTools import Tools
-from pyLibQtTools.Tools import SimpleTextEditDialog
+from pyLibQtTools.Tools import SimpleTextEditDialog, SimpleJSONDialog
+
 
 class ProcessesManagerDialog(QDialog):
     """Employee dialog."""
@@ -133,10 +135,12 @@ class ProcessesManagerDialog(QDialog):
             Tools.info_msg(str_msg)
             return
         elif label == defs_processes.PROCESS_FIELD_SRC_TAG:
-            # str_msg = ('Process source file is not editable')
-            # Tools.info_msg(str_msg)
-            # return
             title = "Process: " + process_name
+            previous_src_content = process[defs_processes.PROCESS_FIELD_SRC]
+            if isinstance(previous_src_content, dict):
+                dialog = SimpleJSONDialog(title, current_text, True)
+                ret = dialog.exec()
+                return
             previous_src_file = process[defs_processes.PROCESS_FIELD_SRC]
             previous_src_file_path = ''
             if os.path.exists(previous_src_file):
@@ -206,6 +210,11 @@ class ProcessesManagerDialog(QDialog):
             process_description = self.tableWidget.item(i, 4).text()
             process_doc = self.tableWidget.item(i, 5).text()
             process_source = self.tableWidget.item(i, 6).text()
+            try:
+                json_object = json.loads(process_source)
+                process_source = json_object
+            except ValueError as e:
+                process_source_is_file_path = True
             process_contributions_methodology = self.tableWidget.item(i, 7).text()
             process_contributions_software = self.tableWidget.item(i, 8).text()
             process = self.processes_manager.processes_by_provider[process_provider][process_name]
@@ -248,8 +257,11 @@ class ProcessesManagerDialog(QDialog):
                         process_contributions)[defs_processes.PROCESS_FIELD_CONTRIBUTIONS_SOFTWARE][i]
                 process_file_path = process[defs_processes.PROCESS_FILE]
                 process_file = os.path.basename(process_file_path)
-                process_src_path = process[defs_processes.PROCESS_FIELD_SRC]
-                process_src = os.path.basename(process_src_path)
+                process_src_content = process[defs_processes.PROCESS_FIELD_SRC]
+                if isinstance(process_src_content, dict):
+                    process_src_content = json.dumps(process_src_content)
+                    # process_src_content = str(process_src_content)
+                # process_src = os.path.basename(process_src_path)
                 process_doc_path = process[defs_processes.PROCESS_FIELD_DOC]
                 process_doc = os.path.basename(process_doc_path)
                 rowPosition = self.tableWidget.rowCount()
@@ -278,7 +290,7 @@ class ProcessesManagerDialog(QDialog):
                 doc_item.setTextAlignment(Qt.AlignCenter)
                 column_pos += 1
                 self.tableWidget.setItem(rowPosition, column_pos, doc_item)
-                src_item = QTableWidgetItem(process_src_path)
+                src_item = QTableWidgetItem(process_src_content)
                 src_item.setTextAlignment(Qt.AlignCenter)
                 column_pos += 1
                 self.tableWidget.setItem(rowPosition, column_pos, src_item)
