@@ -109,8 +109,8 @@ class ProjectProcessesDialog(QDialog):
                 self.edited_process_fields_by_original_label[original_process_label].append(process_field_name)
                 self.tableWidget.item(row, column).setText(text)
         elif column_label == defs_project.PROCESESS_FIELD_LOG_TAG:
-            # dialog = SimpleTextEditDialog(title, current_text, True)
-            dialog = SimpleJSONDialog(title, current_text, True)
+            dialog = SimpleTextEditDialog(title, current_text, True)
+            # dialog = SimpleJSONDialog(title, current_text, True)
             ret = dialog.exec()
         elif column_label == defs_project.PROCESESS_FIELD_PROCESS_CONTENT_TAG:
             # dialog = SimpleTextEditDialog(title, current_text, True)
