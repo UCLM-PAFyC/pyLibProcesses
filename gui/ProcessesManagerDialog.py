@@ -193,7 +193,7 @@ class ProcessesManagerDialog(QDialog):
         else:
             title = "Process: " + process_name
             current_text = label.replace('\n', ' ') + ':\n\n' + current_text
-            dialog = SimpleTextEditDialog(title, current_text, False)
+            dialog = SimpleTextEditDialog(title, current_text, False, self)
             ret = dialog.exec()
             text = dialog.get_text()
             self.tableWidget.item(row, column).setText(text)
