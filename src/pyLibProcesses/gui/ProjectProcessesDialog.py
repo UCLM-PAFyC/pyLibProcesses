@@ -11,7 +11,6 @@ from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialo
 from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt
 
 from pyLibProcesses.defs import defs_project, defs_processes
-
 from pyLibQtTools import Tools
 from pyLibQtTools.Tools import SimpleTextEditDialog, SimpleJSONDialog
 
