@@ -2,9 +2,6 @@
 # David Hernandez Lopez, david.hernandez@uclm.es
 
 import os
-import sys
-import math
-import pathlib
 
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.uic import loadUi
@@ -12,12 +9,6 @@ from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialo
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit,
                              QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem)
 from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt
-
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
-sys.path.append(os.path.join(current_path, '../..'))
-# sys.path.insert(0, '..')
-# sys.path.insert(0, '../..')
 
 from pyLibProcesses.defs import defs_project, defs_processes
 

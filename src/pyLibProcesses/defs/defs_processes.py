@@ -3,10 +3,6 @@
 import os
 import sys
 
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
-# sys.path.insert(0, '..')
-
 PROCESS_PYTHON_PROGRAM = "python"
 PROCESSES_PATH = "processes"
 GDAL_PATH = "gdal"
@@ -32,7 +28,6 @@ PROCESSES_SRC_TYPE_LIBRARY_FUNCTION = "library function"
 PROCESS_DOC_FILE_IS_MANDATORY = False
 PROCESS_SRC_ATTRIBUTE_ARGUMENTS = 'arguments'
 PROCESS_SRC_ATTRIBUTE_ARGUMENTS_NAME = 'name'
-PROCESS_SRC_ATTRIBUTE_ARGUMENTS_VALUE = 'value'
 PROCESS_SRC_ATTRIBUTE_ARGUMENTS_VALUE = 'value'
 PROCESS_SRC_REPORT = 'report'
 

@@ -2,8 +2,6 @@
 # David Hernandez Lopez, david.hernandez@uclm.es
 
 import os
-import sys
-import math
 import pathlib
 import json
 
@@ -14,12 +12,6 @@ from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialo
                              QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem)
 from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt
 
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
-sys.path.append(os.path.join(current_path, '../..'))
-# sys.path.insert(0, '..')
-# sys.path.insert(0, '../..')
-
 from pyLibProcesses.defs import defs_processes
 from pyLibProcesses.ProcessesManager import ProcessesManager
 
@@ -28,7 +20,6 @@ from pyLibParameters.ParametersManager import ParametersManager
 from pyLibParameters.ui_qt.ParametersManagerDialog import ParametersManagerDialog
 from pyLibQtTools import Tools
 from pyLibQtTools.Tools import SimpleTextEditDialog, SimpleJSONDialog
-
 
 class ProcessesManagerDialog(QDialog):
     """Employee dialog."""

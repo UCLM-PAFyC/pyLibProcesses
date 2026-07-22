@@ -2,18 +2,7 @@
 # David Hernandez Lopez, david.hernandez@uclm.es
 
 import os
-import sys
-import pathlib
-import math
-import random
-import re
 import json
-
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
-sys.path.append(os.path.join(current_path, '../..'))
-# sys.path.insert(0, '..')
-# sys.path.insert(0, '../..')
 
 from pyLibProcesses.defs import defs_processes
 
